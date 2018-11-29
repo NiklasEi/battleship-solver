@@ -29,9 +29,13 @@ class BattleShipSolver:
     def start(self):
         self.start_time = time.time()
         self.grid = Grid(self.grid_columns, self.grid_rows, self.counts_columns, self.counts_rows, self.ships)
-        self.runner.run(self.grid.current_state)
-        self.grid.current_state.display()
-        self.print_currently_used_time()
+        while not self.grid.is_solved():
+            self.runner.run(self.grid.current_state)
+            self.grid.current_state.display()
+            self.print_currently_used_time()
+            if time.time() - self.start_time > 5:
+                break
+        print("Done!")
 
     def print_currently_used_time(self):
         print("Ran for: {} seconds".format(str(time.time() - self.start_time)))
@@ -48,4 +52,3 @@ class BattleShipSolver:
         self.runner.add_step(FinishedRows())
         from steps.place_longest_ships import PlaceLongestShips
         self.runner.add_step(PlaceLongestShips())
-

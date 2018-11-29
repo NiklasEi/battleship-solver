@@ -10,3 +10,8 @@ class Grid:
         self.ships = ships
         self.initial_state = GridState(grid=self, ships=ships)
         self.current_state = self.initial_state
+
+    def is_solved(self) -> bool:
+        # ToDo: when getting to have to guess possible solutions one needs more then one state here
+        #    For now just return, whether there are ships left to place
+        return not any(self.current_state.left_ships)
