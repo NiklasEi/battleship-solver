@@ -1,3 +1,4 @@
+from runner import Runner
 from solver.grid import Grid
 import time
 
@@ -22,12 +23,29 @@ class BattleShipSolver:
         # other instance attributes
         self.start_time = None
         self.grid = None
+        self.runner = None
+        self.prepare_runner()
 
     def start(self):
         self.start_time = time.time()
         self.grid = Grid(self.grid_columns, self.grid_rows, self.counts_columns, self.counts_rows, self.ships)
+        self.runner.run(self.grid.current_state)
+        self.grid.current_state.display()
         self.print_currently_used_time()
 
     def print_currently_used_time(self):
         print("Ran for: {} seconds".format(str(time.time() - self.start_time)))
+
+    def prepare_runner(self):
+        self.runner = Runner()
+        from steps.full_columns import FullColumns
+        self.runner.add_step(FullColumns())
+        from steps.full_rows import FullRows
+        self.runner.add_step(FullRows())
+        from steps.finished_columns import FinishedColumns
+        self.runner.add_step(FinishedColumns())
+        from steps.finished_rows import FinishedRows
+        self.runner.add_step(FinishedRows())
+        from steps.place_longest_ships import PlaceLongestShips
+        self.runner.add_step(PlaceLongestShips())
 
