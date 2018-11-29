@@ -10,5 +10,3 @@ class Grid:
         self.ships = ships
         self.initial_state = GridState(grid=self, ships=ships)
         self.current_state = self.initial_state
-
-

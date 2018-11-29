@@ -12,8 +12,11 @@ class PlaceLongestShips(Step):
         if max_length_free_line == max_ship_length:
             ship_count = grid_state.left_ships[max_ship_length]
             free_lines_count = len(grid_state.free_lines[max_length_free_line])
+            print("counts (ships): " + str(ship_count) + "  and (lines): " + str(free_lines_count))
             if free_lines_count == ship_count:
                 return True
+        print("max ship length: " + str(max_ship_length) + "  max free line: " + str(max_length_free_line))
+        print("Ship keys: " + str(grid_state.left_ships.keys()))
         return False
 
     def do_next_step(self, grid_state: GridState):

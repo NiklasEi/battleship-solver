@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import List, Dict
 
 import numpy as np
@@ -11,7 +10,7 @@ class GridState:
             assert grid is not None and ships is not None, \
                 "Either give original GridState or the grid and ships"
             self.grid = grid
-            self.ships = ships
+            self.ships: Dict[int, int] = ships
             self.placed_ships = placed_ships
             self.left_ships: Dict[int, int] = {}
             self.free_lines = {}
@@ -24,6 +23,8 @@ class GridState:
                 "Grid and ships are ignored because of passed original GridState"
             # ToDo
         self.calculate_left_ships()
+        print("Ships: " + str(self.ships) + "   Left ships: " + str(self.left_ships))
+        print("Placed: " + str(self.placed_ships))
         self.update_free_lines()
         print("Current GridState:")
         self.display()
@@ -58,6 +59,10 @@ class GridState:
                     self.current_counts_columns[coordinate[0]] += 1
                     self.current_counts_rows[coordinate[1]] += 1
                 self.placed_ships.setdefault(ship_length, []).append(ship_position)
+                if self.left_ships[ship_length] == 1:
+                    self.left_ships.pop(ship_length)
+                else:
+                    self.left_ships[ship_length] = self.left_ships.pop(ship_length) - 1
                 # ToDo: get surrounding slots of ship and block them!
 
     def update_free_lines(self):
@@ -101,8 +106,9 @@ class GridState:
 
     def calculate_left_ships(self):
         self.left_ships: Dict[int, int] = {}
-        for ship_length, ship_count in enumerate(self.ships):
-            placed_ships_of_length = len(self.placed_ships.setdefault(ship_length, []))
+        for ship_length, ship_count in self.ships.items():
+            print("Ships: " + str(self.ships) + "   current: " + str(ship_length) + ": " + str(ship_count))
+            placed_ships_of_length = 0 if ship_length not in self.placed_ships else len(self.placed_ships[ship_length])
             if placed_ships_of_length < ship_count:
                 self.left_ships[ship_length] = ship_count - placed_ships_of_length
             elif placed_ships_of_length == ship_count:
