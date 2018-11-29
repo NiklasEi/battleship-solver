@@ -1,0 +1,2 @@
+class ImpossiblePuzzleException(Exception):
+    pass
