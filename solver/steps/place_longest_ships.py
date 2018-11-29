@@ -4,6 +4,10 @@ from steps.step import Step
 
 
 class PlaceLongestShips(Step):
+    """
+    Checks (and places the ships) if there are only as many possible lines left for the
+    longest ship, as there are ships left to place for that length.
+    """
 
     def check_for_next_step(self, grid_state: GridState):
         max_ship_length = max(grid_state.left_ships.keys())
