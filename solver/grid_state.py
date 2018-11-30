@@ -49,6 +49,7 @@ class GridState:
         print()
 
     def place_ships(self, ships_to_add):
+        print("Called with: " + str(ships_to_add))
         for ship_length, ship_positions in ships_to_add.items():
             for ship_position in ship_positions:
                 for coordinate in ship_position:
@@ -66,39 +67,8 @@ class GridState:
                 # ToDo: get surrounding slots of ship and block them!
 
     def update_free_lines(self):
-        self.free_lines = {}
-        for column in range(self.grid.columns):
-            consecutive_free_slots = 0
-            current_slots = []
-            for row in range(self.grid.rows):
-                if self.state[column][row] != SlotState.EMPTY.value:
-                    if consecutive_free_slots > 0:
-                        self.free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
-                        consecutive_free_slots = 0
-                        current_slots = []
-                        continue
-                else:
-                    current_slots.append([column, row])
-                    consecutive_free_slots += 1
-
-            if consecutive_free_slots > 0:
-                self.free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
-        for row in range(self.grid.rows):
-            consecutive_free_slots = 0
-            current_slots = []
-            for column in range(self.grid.columns):
-                if self.state[column][row] != SlotState.EMPTY.value:
-                    if consecutive_free_slots > 0:
-                        self.free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
-                        consecutive_free_slots = 0
-                        current_slots = []
-                        continue
-                else:
-                    current_slots.append([column, row])
-                    consecutive_free_slots += 1
-
-            if consecutive_free_slots > 0:
-                self.free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
+        self.free_lines: Dict[int, List[List[int]]] = \
+            self.get_free_lines({"rows": list(range(self.grid.rows)), "columns": list(range(self.grid.columns))})
 
     def get_surrounding_slots(self, slots: List[List[int]]):
         # ToDo
@@ -116,3 +86,43 @@ class GridState:
             else:
                 raise ValueError('More ships placed of length ' + str(ship_length) + " then there are in puzzle!"
                                  + str(placed_ships_of_length) + "/" + str(ship_count))
+
+    def get_free_lines(self, columns_and_rows: Dict[str, List[int]]) -> Dict[int, List[List[List[int]]]]:
+        free_lines: Dict[int, List[List[List[int]]]] = {}
+        key_rows = "rows"
+        key_columns = "columns"
+        if key_rows in columns_and_rows:
+            for row in columns_and_rows[key_rows]:
+                consecutive_free_slots = 0
+                current_slots: List[List[int]] = []
+                for column in range(self.grid.columns):
+                    if self.state[column][row] != SlotState.EMPTY.value:
+                        if consecutive_free_slots > 0:
+                            free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
+                            consecutive_free_slots = 0
+                            current_slots = []
+                            continue
+                    else:
+                        current_slots.append([column, row])
+                        consecutive_free_slots += 1
+                if consecutive_free_slots > 0:
+                    free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
+
+        if key_columns in columns_and_rows:
+            for column in columns_and_rows[key_columns]:
+                consecutive_free_slots = 0
+                current_slots = []
+                for row in range(self.grid.rows):
+                    if self.state[column][row] != SlotState.EMPTY.value:
+                        if consecutive_free_slots > 0:
+                            free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
+                            consecutive_free_slots = 0
+                            current_slots = []
+                            continue
+                    else:
+                        current_slots.append([column, row])
+                        consecutive_free_slots += 1
+                if consecutive_free_slots > 0:
+                    free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
+
+        return free_lines

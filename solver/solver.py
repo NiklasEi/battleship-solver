@@ -42,10 +42,8 @@ class BattleShipSolver:
 
     def prepare_runner(self):
         self.runner = Runner()
-        from steps.full_columns import FullColumns
-        self.runner.add_step(FullColumns())
-        from steps.full_rows import FullRows
-        self.runner.add_step(FullRows())
+        from steps.fill_up_ships import FillUpShips
+        self.runner.add_step(FillUpShips())
         from steps.finished_columns import FinishedColumns
         self.runner.add_step(FinishedColumns())
         from steps.finished_rows import FinishedRows

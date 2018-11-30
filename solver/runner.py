@@ -19,7 +19,9 @@ class Runner:
                 time_start = time.time()
                 print("Running step " + str(step.__class__.__name__) + ": Changes? "
                       + str(step.check_for_next_step(grid_state)))
-                step.do_next_step(grid_state)
-                print("Took " + str(time.time() - time_start) + " seconds")
+                if step.check_for_next_step(grid_state):
+                    step.do_next_step(grid_state)
+                    grid_state.display()
+                    print("Took " + str(time.time() - time_start) + " seconds")
             elif step.check_for_next_step(grid_state):
                 step.do_next_step(grid_state)
