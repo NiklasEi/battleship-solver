@@ -17,18 +17,22 @@ class PuzzleState:
         self.current_counts_columns = np.zeros(self.puzzle.columns, dtype=int)
         self.current_counts_rows = np.zeros(self.puzzle.rows, dtype=int)
         self.state = np.full((self.puzzle.columns, self.puzzle.rows), SlotState.EMPTY.value)
-        self.left_ships: Dict[int, int] = {}
+        self.missing_ships: Dict[int, int] = {}
         self.free_lines = {}
         self.placed_ships = {}
-        self.calculate_left_ships()
+        self.currently_free_lines_in_columns: Dict[int, Dict[int, List[List[List[int]]]]] = {}
+        self.currently_free_lines_in_rows: Dict[int, Dict[int, List[List[List[int]]]]] = {}
+        self.currently_missing_ships_in_columns: List[int] = []
+        self.currently_missing_ships_in_rows: List[int] = []
         if initial_state is not None:
             print("loading initial state...")
             for row, states_string in enumerate(initial_state):
                 for column, state_string in enumerate(list(states_string)):
                     self.place_single_slot_state(column, row, SlotState(state_string))
 
-        print("Ships: " + str(self.ships) + "   Left ships: " + str(self.left_ships))
+        print("Ships: " + str(self.ships) + "   Left ships: " + str(self.missing_ships))
         print("Placed: " + str(self.placed_ships))
+        self.calculate_missing_ships()
         self.update_free_lines()
         print("Current GridState:")
         self.display()
@@ -64,29 +68,49 @@ class PuzzleState:
                     self.current_counts_columns[coordinate[0]] += 1
                     self.current_counts_rows[coordinate[1]] += 1
                 self.placed_ships.setdefault(ship_length, []).append(ship_position)
-                if self.left_ships[ship_length] == 1:
-                    self.left_ships.pop(ship_length)
+                if self.missing_ships[ship_length] == 1:
+                    self.missing_ships.pop(ship_length)
                 else:
-                    self.left_ships[ship_length] = self.left_ships.pop(ship_length) - 1
+                    self.missing_ships[ship_length] = self.missing_ships.pop(ship_length) - 1
                 for column, row in self.puzzle.get_surrounding_slots(ship_position):
                     self.state[column][row] = SlotState.WATER.value
 
-    def update_free_lines(self):
-        self.free_lines: Dict[int, List[List[int]]] = \
-            self.get_free_lines({"rows": list(range(self.puzzle.rows)), "columns": list(range(self.puzzle.columns))})
+    def update(self):
+        self.calculate_missing_ships()
+        self.update_free_lines()
 
-    def calculate_left_ships(self):
-        self.left_ships: Dict[int, int] = {}
+    def update_free_lines(self):
+        self.currently_free_lines_in_rows: Dict[int, Dict[int, List[List[List[int]]]]] = {}
+        for column in range(self.puzzle.columns):
+            self.currently_free_lines_in_columns[column] = self.get_free_lines({"columns": [column]})
+        for row in range(self.puzzle.rows):
+            self.currently_free_lines_in_rows[row] = self.get_free_lines({"rows": [row]})
+        self.free_lines: Dict[int, List[List[List[int]]]] = {}
+        for row_dict in self.currently_free_lines_in_rows.values():
+            for line_length, lines in row_dict.items():
+                self.free_lines.setdefault(line_length, []).extend(lines)
+        for column_dict in self.currently_free_lines_in_columns.values():
+            for line_length, lines in column_dict.items():
+                self.free_lines.setdefault(line_length, []).extend(lines)
+
+    def calculate_missing_ships(self):
+        self.missing_ships: Dict[int, int] = {}
         for ship_length, ship_count in self.ships.items():
             print("Ships: " + str(self.ships) + "   current: " + str(ship_length) + ": " + str(ship_count))
             placed_ships_of_length = 0 if ship_length not in self.placed_ships else len(self.placed_ships[ship_length])
             if placed_ships_of_length < ship_count:
-                self.left_ships[ship_length] = ship_count - placed_ships_of_length
+                self.missing_ships[ship_length] = ship_count - placed_ships_of_length
             elif placed_ships_of_length == ship_count:
                 continue
             else:
                 raise ValueError('More ships placed of length ' + str(ship_length) + " then there are in puzzle!"
                                  + str(placed_ships_of_length) + "/" + str(ship_count))
+        self.currently_missing_ships_in_columns \
+            = [count - placed for (count, placed)
+               in zip(self.puzzle.counts_columns, self.current_counts_columns)]
+        self.currently_missing_ships_in_rows \
+            = [count - placed for (count, placed)
+               in zip(self.puzzle.counts_rows, self.current_counts_rows)]
 
     def get_free_lines(self, columns_and_rows: Dict[str, List[int]]) -> Dict[int, List[List[List[int]]]]:
         free_lines: Dict[int, List[List[List[int]]]] = {}
@@ -105,7 +129,6 @@ class PuzzleState:
                             continue
                     elif consecutive_free_slots > 0 or self.state[column][row] == SlotState.EMPTY.value \
                             or self.state[column][row] == SlotState.SHIP_WEST.value:
-                        print("adding slot with state " + self.state[column][row] + " to line with coordinates " + str(column) + "/" + str(row))
                         current_slots.append([column, row])
                         consecutive_free_slots += 1
                 if consecutive_free_slots > 0:
@@ -131,12 +154,6 @@ class PuzzleState:
 
         return free_lines
 
-    def place_ship(self, column: int, row: int, slot_state: SlotState):
-        if self.state[column][row] != SlotState.EMPTY.value:
-            print("Unexpected value in slot! Should be empty, found: "
-                  + SlotState(self.state[column][row]).name + "; Overwriting with: " + slot_state.value)
-        pass
-
     def place_single_slot_state(self, column, row, slot_state: SlotState):
         print("placing " + slot_state.value + " in " + str(column) + "/" + str(row))
         if slot_state is SlotState.EMPTY:
@@ -149,7 +166,7 @@ class PuzzleState:
                 self.state[coordinate[0]][coordinate[1]] = SlotState.WATER.value
             if slot_state is SlotState.SHIP_SINGLE:
                 self.placed_ships.setdefault(1, []).append([[column, row]])
-                if self.left_ships[1] == 1:
-                    self.left_ships.pop(1)
+                if self.missing_ships[1] == 1:
+                    self.missing_ships.pop(1)
                 else:
-                    self.left_ships[1] = self.left_ships.pop(1) - 1
+                    self.missing_ships[1] = self.missing_ships.pop(1) - 1

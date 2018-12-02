@@ -25,7 +25,7 @@ class Puzzle:
     def is_solved(self) -> bool:
         # ToDo: when getting to have to guess possible solutions one needs more then one state here
         #    For now just return, whether there are ships left to place
-        return not any(self.current_state.left_ships)
+        return not any(self.current_state.missing_ships)
 
     def get_surrounding_slots(self, slots: List[List[int]], slot_state: SlotState=None) -> List[List[int]]:
         """

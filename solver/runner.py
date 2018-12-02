@@ -24,6 +24,7 @@ class Runner:
                       + str(step.check_for_next_step(grid_state)))
                 if step.check_for_next_step(grid_state):
                     step.do_next_step(grid_state)
+                    grid_state.update()
                     grid_state.display()
                     print("Took " + str(time.time() - time_start) + " seconds")
             elif step.check_for_next_step(grid_state):
