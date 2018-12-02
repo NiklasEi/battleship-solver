@@ -159,14 +159,23 @@ class PuzzleState:
         if slot_state is SlotState.EMPTY:
             return
         self.state[column][row] = slot_state.value
-        if slot_state is not SlotState.WATER:
-            self.current_counts_columns[column] += 1
-            self.current_counts_rows[row] += 1
-            for coordinate in self.puzzle.get_surrounding_slots([[column, row]], slot_state=slot_state):
-                self.state[coordinate[0]][coordinate[1]] = SlotState.WATER.value
-            if slot_state is SlotState.SHIP_SINGLE:
-                self.placed_ships.setdefault(1, []).append([[column, row]])
-                if self.missing_ships[1] == 1:
-                    self.missing_ships.pop(1)
-                else:
-                    self.missing_ships[1] = self.missing_ships.pop(1) - 1
+        if slot_state is SlotState.WATER:
+            return
+        self.current_counts_columns[column] += 1
+        self.current_counts_rows[row] += 1
+        surrounding_water = self.puzzle.get_surrounding_slots([[column, row]], slot_state=slot_state)
+        for coordinate in surrounding_water:
+            self.state[coordinate[0]][coordinate[1]] = SlotState.WATER.value
+        if slot_state is SlotState.SHIP_SINGLE:
+            self.placed_ships.setdefault(1, []).append([[column, row]])
+            if self.missing_ships[1] == 1:
+                self.missing_ships.pop(1)
+            else:
+                self.missing_ships[1] = self.missing_ships.pop(1) - 1
+        elif slot_state is not SlotState.SHIP:
+            # get the slot next to the ship ending and place a ship there
+            for column, row in self.puzzle.get_surrounding_slots([[column, row]]):
+                if [column, row] in surrounding_water:
+                    continue
+                self.place_single_slot_state(column, row, slot_state=SlotState.SHIP)
+                break
