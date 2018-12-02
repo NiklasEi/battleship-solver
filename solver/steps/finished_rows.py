@@ -18,4 +18,4 @@ class FinishedRows(Step):
             if count == grid_state.current_counts_rows[row]:
                 for column in range(grid_state.grid.columns):
                     if grid_state.state[column][row] == SlotState.EMPTY.value:
-                        grid_state.state[column][row] = SlotState.BLOCKED.value
+                        grid_state.state[column][row] = SlotState.WATER.value

@@ -1,6 +1,8 @@
 import os
 import unittest
 import json
+
+from enums.puzzle_param import PuzzleParam
 from solver.solver import BattleShipSolver
 from typing import Dict
 from unittest import TestCase
@@ -22,8 +24,11 @@ class TestPuzzles(TestCase):
     def test_puzzles(self):
         for count, puzzle_json_dict in enumerate(self.puzzle_json["puzzles"]):
             puzzle = self.load_puzzle_data(puzzle_json_dict)
-            current_solver = BattleShipSolver(puzzle["columns"], puzzle["rows"], puzzle["ships"]
-                                              , puzzle["counts_columns"], puzzle["counts_rows"])
+            current_solver = BattleShipSolver(puzzle[PuzzleParam.COLUMNS.value],
+                                              puzzle[PuzzleParam.ROWS.value],
+                                              puzzle[PuzzleParam.SHIPS.value],
+                                              puzzle[PuzzleParam.COUNTS_COLUMNS.value],
+                                              puzzle[PuzzleParam.COUNTS_ROWS.value])
             current_solver.start()
             print("Puzzle " + str(count))
             del current_solver

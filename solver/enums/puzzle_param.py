@@ -7,6 +7,8 @@ class PuzzleParam(Enum):
     Enum representing keys for puzzle parameters.
     Hide magic values for serialization and deserialization.
     """
-    ROWS = " "
-    SHIP = "O"
-    BLOCKED = "X"
+    ROWS = "rows"
+    COLUMNS = "columns"
+    SHIPS = "ships"
+    COUNTS_COLUMNS = "counts_columns"
+    COUNTS_ROWS = "counts_rows"
