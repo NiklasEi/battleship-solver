@@ -17,10 +17,10 @@ class Puzzle:
         self.ships = puzzle[PuzzleParam.SHIPS.value]
         if PuzzleParam.INITIAL_STATE.value in puzzle:
             print("Found initial state " + str(puzzle[PuzzleParam.INITIAL_STATE.value]))
-            self.initial_state = PuzzleState(self, self.ships, initial_state=puzzle[PuzzleParam.INITIAL_STATE.value])
+            self.initial_state: PuzzleState = PuzzleState(self, self.ships, initial_state=puzzle[PuzzleParam.INITIAL_STATE.value])
         else:
-            self.initial_state = PuzzleState(self, self.ships)
-        self.current_state = self.initial_state
+            self.initial_state: PuzzleState = PuzzleState(self, self.ships)
+        self.current_state: PuzzleState = self.initial_state
 
     def is_solved(self) -> bool:
         # ToDo: when getting to have to guess possible solutions one needs more then one state here

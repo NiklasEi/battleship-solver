@@ -45,26 +45,28 @@ class BattleShipSolver:
         self.prepare_runner()
 
     def start(self):
+        self.prepare_puzzle()
         self.start_time = time.time()
-        self.puzzle = Puzzle(self.puzzle_data)
         while not self.puzzle.is_solved():
             self.runner.run(self.puzzle.current_state)
-            self.puzzle.current_state.display()
             self.print_currently_used_time()
-            if time.time() - self.start_time > 0.5:
+            if time.time() - self.start_time > 0.2:
                 break
         print("Done!")
+
+    def prepare_puzzle(self):
+        self.puzzle = Puzzle(self.puzzle_data)
 
     def print_currently_used_time(self):
         print("Ran for: {} seconds".format(str(time.time() - self.start_time)))
 
     def prepare_runner(self):
         self.runner = Runner()
-        from steps.fill_up_ships import FillUpShips
-        self.runner.add_step(FillUpShips())
         from steps.finished_columns import FinishedColumns
         self.runner.add_step(FinishedColumns())
         from steps.finished_rows import FinishedRows
         self.runner.add_step(FinishedRows())
+        from steps.fill_up_ships import FillUpShips
+        self.runner.add_step(FillUpShips())
         from steps.place_longest_ships import PlaceLongestShips
         self.runner.add_step(PlaceLongestShips())

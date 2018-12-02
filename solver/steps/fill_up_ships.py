@@ -21,23 +21,22 @@ class FillUpShips(Step):
 
     def check_for_next_step(self, grid_state: PuzzleState) -> bool:
         for column in range(grid_state.puzzle.columns):
-            if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_columns[column]) \
-                    == self.currently_missing_ships_in_columns[column] \
-                    and self.currently_missing_ships_in_columns[column] > 0:
-                return True
+            if 0 < self.currently_missing_ships_in_columns[column] \
+                    == FillUpShips.count_slots_in_lines(self.currently_free_lines_in_columns[column]):
+                if not self.are_correct_ships_missing(grid_state, self.currently_free_lines_in_columns[column]):
+                    continue
         for row in range(grid_state.puzzle.rows):
-            if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_rows[row]) \
-                    == self.currently_missing_ships_in_rows[row] \
-                    and self.currently_missing_ships_in_rows[row] > 0:
-                return True
+            if 0 < self.currently_missing_ships_in_rows[row] == \
+                    FillUpShips.count_slots_in_lines(self.currently_free_lines_in_rows[row]):
+                if not self.are_correct_ships_missing(grid_state, self.currently_free_lines_in_columns[column]):
+                    continue
         return False
 
     def do_next_step(self, grid_state: PuzzleState):
         changes = False
         for column in range(grid_state.puzzle.columns):
-            if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_columns[column]) \
-                    == self.currently_missing_ships_in_columns[column] \
-                    and self.currently_missing_ships_in_columns[column] > 0:
+            if 0 < self.currently_missing_ships_in_columns[column] \
+                    == FillUpShips.count_slots_in_lines(self.currently_free_lines_in_columns[column]):
                 if not self.are_correct_ships_missing(grid_state, self.currently_free_lines_in_columns[column]):
                     continue
                 grid_state.place_ships(self.currently_free_lines_in_columns[column])
@@ -47,9 +46,8 @@ class FillUpShips(Step):
         if changes:
             self.prepare(grid_state)
         for row in range(grid_state.puzzle.rows):
-            if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_rows[row]) \
-                    == self.currently_missing_ships_in_rows[row] \
-                    and self.currently_missing_ships_in_rows[row] > 0:
+            if 0 < self.currently_missing_ships_in_rows[row] == \
+                    FillUpShips.count_slots_in_lines(self.currently_free_lines_in_rows[row]):
                 if not self.are_correct_ships_missing(grid_state, self.currently_free_lines_in_rows[row]):
                     continue
                 grid_state.place_ships(self.currently_free_lines_in_rows[row])

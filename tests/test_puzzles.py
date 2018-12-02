@@ -28,6 +28,15 @@ class TestPuzzles(TestCase):
             print("Puzzle " + str(count))
             del current_solver
 
+    def test_free_lines(self):
+        for count, puzzle_json_dict in enumerate(self.puzzle_json["puzzles"]):
+            puzzle = self.load_puzzle_data(puzzle_json_dict)
+            current_solver = BattleShipSolver(puzzle)
+            current_solver.prepare_puzzle()
+            print(current_solver.puzzle.initial_state.get_free_lines({"rows": range(current_solver.puzzle.rows)}))
+            print("Puzzle " + str(count))
+            del current_solver
+
     @staticmethod
     def load_puzzle_data(puzzle_dict) -> Dict:
         """

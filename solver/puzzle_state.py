@@ -53,7 +53,7 @@ class PuzzleState:
         print()
 
     def place_ships(self, ships_to_add):
-        print("Called with: " + str(ships_to_add))
+        print("Placing ships: " + str(ships_to_add))
         for ship_length, ship_positions in ships_to_add.items():
             for ship_position in ship_positions:
                 for coordinate in ship_position:
@@ -68,7 +68,8 @@ class PuzzleState:
                     self.left_ships.pop(ship_length)
                 else:
                     self.left_ships[ship_length] = self.left_ships.pop(ship_length) - 1
-                # ToDo: get surrounding slots of ship and block them!
+                for column, row in self.puzzle.get_surrounding_slots(ship_position):
+                    self.state[column][row] = SlotState.WATER.value
 
     def update_free_lines(self):
         self.free_lines: Dict[int, List[List[int]]] = \
@@ -96,13 +97,15 @@ class PuzzleState:
                 consecutive_free_slots = 0
                 current_slots: List[List[int]] = []
                 for column in range(self.puzzle.columns):
-                    if self.state[column][row] != SlotState.EMPTY.value:
+                    if self.state[column][row] == SlotState.WATER.value:
                         if consecutive_free_slots > 0:
                             free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
                             consecutive_free_slots = 0
                             current_slots = []
                             continue
-                    else:
+                    elif consecutive_free_slots > 0 or self.state[column][row] == SlotState.EMPTY.value \
+                            or self.state[column][row] == SlotState.SHIP_WEST.value:
+                        print("adding slot with state " + self.state[column][row] + " to line with coordinates " + str(column) + "/" + str(row))
                         current_slots.append([column, row])
                         consecutive_free_slots += 1
                 if consecutive_free_slots > 0:
@@ -113,13 +116,14 @@ class PuzzleState:
                 consecutive_free_slots = 0
                 current_slots = []
                 for row in range(self.puzzle.rows):
-                    if self.state[column][row] != SlotState.EMPTY.value:
+                    if self.state[column][row] == SlotState.WATER.value:
                         if consecutive_free_slots > 0:
                             free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
                             consecutive_free_slots = 0
                             current_slots = []
                             continue
-                    else:
+                    elif consecutive_free_slots > 0 or self.state[column][row] == SlotState.EMPTY.value \
+                            or self.state[column][row] == SlotState.SHIP_NORTH.value:
                         current_slots.append([column, row])
                         consecutive_free_slots += 1
                 if consecutive_free_slots > 0:
@@ -149,4 +153,3 @@ class PuzzleState:
                     self.left_ships.pop(1)
                 else:
                     self.left_ships[1] = self.left_ships.pop(1) - 1
-
