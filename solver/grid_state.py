@@ -5,6 +5,11 @@ from solver.slot_state import SlotState
 
 
 class GridState:
+    """
+    Represents a state of a grid.
+    This includes a given grid with certain dimensions and ships,
+    but also the current state of the solving process.
+    """
     def __init__(self, grid=None, ships=None, placed_ships={}, origin=None):
         if origin is None:
             assert grid is not None and ships is not None, \

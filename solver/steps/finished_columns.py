@@ -4,6 +4,9 @@ from steps.step import Step
 
 
 class FinishedColumns(Step):
+    """
+    Blocks empty slots in columns that already have the desired number of ships placed.
+    """
     def check_for_next_step(self, grid_state: GridState):
         for column, count in enumerate(grid_state.grid.counts_columns):
             if count == grid_state.current_counts_columns[column]:

@@ -5,7 +5,7 @@ from steps.step import Step
 
 class PlaceLongestShips(Step):
     """
-    Checks (and places the ships) if there are only as many possible lines left for the
+    Checks whether there are only as many possible lines left for the
     longest ship, as there are ships left to place for that length.
     """
 

@@ -6,6 +6,9 @@ from steps.step import Step
 
 
 class Runner:
+    """
+    This class contains a list with logic steps that can be subsequently executed.
+    """
     debug = True
     steps: List[Step] = []
 

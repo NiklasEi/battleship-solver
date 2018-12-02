@@ -4,6 +4,12 @@ import time
 
 
 class BattleShipSolver:
+    """
+    This class represents the solver.
+
+    It directly controls the runners, that can run the different logic steps
+    to solve a battleship puzzle.
+    """
     def __init__(self, grid_columns, grid_rows, ships, counts_columns, counts_rows):
         self.ships = ships
         self.grid_columns = grid_columns
