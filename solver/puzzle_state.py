@@ -10,20 +10,23 @@ class PuzzleState:
     This includes a given grid with certain dimensions and ships,
     but also the current state of the solving process.
     """
-    def __init__(self, puzzle, ships, initial_state: List[str]=None):
+
+    def __init__(self, puzzle, ships, initial_state: List[str] = None):
         self.puzzle = puzzle
         self.ships: Dict[int, int] = ships
-        if initial_state is None:
-            self.placed_ships = {}
-            self.left_ships: Dict[int, int] = {}
-            self.free_lines = {}
-            self.current_counts_columns = np.zeros(self.puzzle.columns, dtype=int)
-            self.current_counts_rows = np.zeros(self.puzzle.rows, dtype=int)
-            self.state = np.full((self.puzzle.columns, self.puzzle.rows), SlotState.EMPTY.value)
-        else:
-            pass
-            # ToDo
+        self.current_counts_columns = np.zeros(self.puzzle.columns, dtype=int)
+        self.current_counts_rows = np.zeros(self.puzzle.rows, dtype=int)
+        self.state = np.full((self.puzzle.columns, self.puzzle.rows), SlotState.EMPTY.value)
+        self.left_ships: Dict[int, int] = {}
+        self.free_lines = {}
+        self.placed_ships = {}
         self.calculate_left_ships()
+        if initial_state is not None:
+            print("loading initial state...")
+            for row, states_string in enumerate(initial_state):
+                for column, state_string in enumerate(list(states_string)):
+                    self.place_single_slot_state(column, row, SlotState(state_string))
+
         print("Ships: " + str(self.ships) + "   Left ships: " + str(self.left_ships))
         print("Placed: " + str(self.placed_ships))
         self.update_free_lines()
@@ -70,10 +73,6 @@ class PuzzleState:
     def update_free_lines(self):
         self.free_lines: Dict[int, List[List[int]]] = \
             self.get_free_lines({"rows": list(range(self.puzzle.rows)), "columns": list(range(self.puzzle.columns))})
-
-    def get_surrounding_slots(self, slots: List[List[int]]):
-        # ToDo
-        pass
 
     def calculate_left_ships(self):
         self.left_ships: Dict[int, int] = {}
@@ -127,3 +126,27 @@ class PuzzleState:
                     free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
 
         return free_lines
+
+    def place_ship(self, column: int, row: int, slot_state: SlotState):
+        if self.state[column][row] != SlotState.EMPTY.value:
+            print("Unexpected value in slot! Should be empty, found: "
+                  + SlotState(self.state[column][row]).name + "; Overwriting with: " + slot_state.value)
+        pass
+
+    def place_single_slot_state(self, column, row, slot_state: SlotState):
+        print("placing " + slot_state.value + " in " + str(column) + "/" + str(row))
+        if slot_state is SlotState.EMPTY:
+            return
+        self.state[column][row] = slot_state.value
+        if slot_state is not SlotState.WATER:
+            self.current_counts_columns[column] += 1
+            self.current_counts_rows[row] += 1
+            for coordinate in self.puzzle.get_surrounding_slots([[column, row]], slot_state=slot_state):
+                self.state[coordinate[0]][coordinate[1]] = SlotState.WATER.value
+            if slot_state is SlotState.SHIP_SINGLE:
+                self.placed_ships.setdefault(1, []).append([[column, row]])
+                if self.left_ships[1] == 1:
+                    self.left_ships.pop(1)
+                else:
+                    self.left_ships[1] = self.left_ships.pop(1) - 1
+

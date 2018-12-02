@@ -10,7 +10,6 @@ class SlotState(Enum):
     EMPTY = " "
     SHIP = "X"  # unknown piece of ship
     WATER = "~"
-    SHIP_CENTER = "c"
     SHIP_NORTH = "n"
     SHIP_SOUTH = "s"
     SHIP_EAST = "e"
