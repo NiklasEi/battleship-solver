@@ -25,9 +25,9 @@ class PlaceLongestShips(Step):
         max_length_free_line = max(grid_state.free_lines.keys())
         if max_length_free_line == max_ship_length:
             ship_count = grid_state.missing_ships[max_ship_length]
-            free_lines_count = sum([len(free_lines[max_length_free_line])
+            free_lines_count = sum([len(free_lines[max_length_free_line] if max_length_free_line in free_lines else ())
                                     for free_lines in self.relevant_free_lines_in_columns.values()])
-            free_lines_count += sum([len(free_lines[max_length_free_line])
+            free_lines_count += sum([len(free_lines[max_length_free_line] if max_length_free_line in free_lines else ())
                                     for free_lines in self.relevant_free_lines_in_rows.values()])
             if free_lines_count == ship_count:
                 return True
@@ -38,9 +38,9 @@ class PlaceLongestShips(Step):
         max_length_free_line = max(grid_state.free_lines.keys())
         if max_length_free_line == max_ship_length:
             ship_count = grid_state.missing_ships[max_ship_length]
-            free_lines_count = sum([len(free_lines[max_length_free_line])
+            free_lines_count = sum([len(free_lines[max_length_free_line] if max_length_free_line in free_lines else ())
                                     for free_lines in self.relevant_free_lines_in_columns.values()])
-            free_lines_count += sum([len(free_lines[max_length_free_line])
+            free_lines_count += sum([len(free_lines[max_length_free_line] if max_length_free_line in free_lines else ())
                                     for free_lines in self.relevant_free_lines_in_rows.values()])
             if free_lines_count > ship_count:
                 pass

@@ -17,6 +17,8 @@ class Runner:
 
     def run(self, grid_state: PuzzleState):
         for step in self.steps:
+            if grid_state.puzzle.is_solved():
+                return
             step.prepare(grid_state)
             if self.debug:
                 time_start = time.time()

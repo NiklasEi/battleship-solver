@@ -24,16 +24,17 @@ class PuzzleState:
         self.currently_free_lines_in_rows: Dict[int, Dict[int, List[List[List[int]]]]] = {}
         self.currently_missing_ships_in_columns: List[int] = []
         self.currently_missing_ships_in_rows: List[int] = []
+        self.calculate_missing_ships()
+        self.update_free_lines()
         if initial_state is not None:
             print("loading initial state...")
             for row, states_string in enumerate(initial_state):
                 for column, state_string in enumerate(list(states_string)):
                     self.place_single_slot_state(column, row, SlotState(state_string))
-
+            self.calculate_missing_ships()
+            self.update_free_lines()
         print("Ships: " + str(self.ships) + "   Left ships: " + str(self.missing_ships))
         print("Placed: " + str(self.placed_ships))
-        self.calculate_missing_ships()
-        self.update_free_lines()
         print("Current GridState:")
         self.display()
 
@@ -96,7 +97,6 @@ class PuzzleState:
     def calculate_missing_ships(self):
         self.missing_ships: Dict[int, int] = {}
         for ship_length, ship_count in self.ships.items():
-            print("Ships: " + str(self.ships) + "   current: " + str(ship_length) + ": " + str(ship_count))
             placed_ships_of_length = 0 if ship_length not in self.placed_ships else len(self.placed_ships[ship_length])
             if placed_ships_of_length < ship_count:
                 self.missing_ships[ship_length] = ship_count - placed_ships_of_length
