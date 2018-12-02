@@ -4,28 +4,24 @@ import numpy as np
 from enums.slot_state import SlotState
 
 
-class GridState:
+class PuzzleState:
     """
-    Represents a state of a grid.
+    Represents a state of a puzzle.
     This includes a given grid with certain dimensions and ships,
     but also the current state of the solving process.
     """
-    def __init__(self, grid=None, ships=None, placed_ships={}, origin=None):
-        if origin is None:
-            assert grid is not None and ships is not None, \
-                "Either give original GridState or the grid and ships"
-            self.grid = grid
-            self.ships: Dict[int, int] = ships
-            self.placed_ships = placed_ships
+    def __init__(self, puzzle, ships, initial_state: List[str]=None):
+        self.puzzle = puzzle
+        self.ships: Dict[int, int] = ships
+        if initial_state is None:
+            self.placed_ships = {}
             self.left_ships: Dict[int, int] = {}
             self.free_lines = {}
-            self.current_counts_columns = np.zeros(self.grid.columns, dtype=int)
-            self.current_counts_rows = np.zeros(self.grid.rows, dtype=int)
-            self.state = np.full((self.grid.columns, self.grid.rows), SlotState.EMPTY.value)
-            self.place_ships(placed_ships)
+            self.current_counts_columns = np.zeros(self.puzzle.columns, dtype=int)
+            self.current_counts_rows = np.zeros(self.puzzle.rows, dtype=int)
+            self.state = np.full((self.puzzle.columns, self.puzzle.rows), SlotState.EMPTY.value)
         else:
-            assert grid is None and ships is None, \
-                "Grid and ships are ignored because of passed original GridState"
+            pass
             # ToDo
         self.calculate_left_ships()
         print("Ships: " + str(self.ships) + "   Left ships: " + str(self.left_ships))
@@ -35,22 +31,22 @@ class GridState:
         self.display()
 
     def display(self):
-        for row in range(self.grid.rows):
-            for column in range(self.grid.columns):
+        for row in range(self.puzzle.rows):
+            for column in range(self.puzzle.columns):
                 print("+---", end='')
             print("+")
             print("| ", end='')
-            for column in range(self.grid.columns):
+            for column in range(self.puzzle.columns):
                 print(self.state[column][row] + " | ", end='')
-            print(" " + str(self.current_counts_rows[row]) + "/" + str(self.grid.counts_rows[row]))
+            print(" " + str(self.current_counts_rows[row]) + "/" + str(self.puzzle.counts_rows[row]))
 
-        for column in range(self.grid.columns):
+        for column in range(self.puzzle.columns):
             print("+---", end='')
         print("+")
 
-        for column in range(self.grid.columns):
+        for column in range(self.puzzle.columns):
             print(" " + str(self.current_counts_columns[column])
-                  + "/" + str(self.grid.counts_columns[column]), end='')
+                  + "/" + str(self.puzzle.counts_columns[column]), end='')
         print()
 
     def place_ships(self, ships_to_add):
@@ -73,7 +69,7 @@ class GridState:
 
     def update_free_lines(self):
         self.free_lines: Dict[int, List[List[int]]] = \
-            self.get_free_lines({"rows": list(range(self.grid.rows)), "columns": list(range(self.grid.columns))})
+            self.get_free_lines({"rows": list(range(self.puzzle.rows)), "columns": list(range(self.puzzle.columns))})
 
     def get_surrounding_slots(self, slots: List[List[int]]):
         # ToDo
@@ -100,7 +96,7 @@ class GridState:
             for row in columns_and_rows[key_rows]:
                 consecutive_free_slots = 0
                 current_slots: List[List[int]] = []
-                for column in range(self.grid.columns):
+                for column in range(self.puzzle.columns):
                     if self.state[column][row] != SlotState.EMPTY.value:
                         if consecutive_free_slots > 0:
                             free_lines.setdefault(consecutive_free_slots, []).append(current_slots)
@@ -117,7 +113,7 @@ class GridState:
             for column in columns_and_rows[key_columns]:
                 consecutive_free_slots = 0
                 current_slots = []
-                for row in range(self.grid.rows):
+                for row in range(self.puzzle.rows):
                     if self.state[column][row] != SlotState.EMPTY.value:
                         if consecutive_free_slots > 0:
                             free_lines.setdefault(consecutive_free_slots, []).append(current_slots)

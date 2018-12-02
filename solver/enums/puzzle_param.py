@@ -12,3 +12,4 @@ class PuzzleParam(Enum):
     SHIPS = "ships"
     COUNTS_COLUMNS = "counts_columns"
     COUNTS_ROWS = "counts_rows"
+    INITIAL_STATE = "initial_state"

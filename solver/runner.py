@@ -1,7 +1,7 @@
 import time
 from typing import List
 
-from grid_state import GridState
+from puzzle_state import PuzzleState
 from steps.step import Step
 
 
@@ -15,7 +15,7 @@ class Runner:
     def add_step(self, step: Step):
         self.steps.append(step)
 
-    def run(self, grid_state: GridState):
+    def run(self, grid_state: PuzzleState):
         for step in self.steps:
             step.prepare(grid_state)
             if self.debug:

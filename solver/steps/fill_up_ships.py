@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from grid_state import GridState
+from puzzle_state import PuzzleState
 from steps.step import Step
 
 
@@ -19,22 +19,22 @@ class FillUpShips(Step):
         self.currently_missing_ships_in_columns: List[int] = []
         self.currently_missing_ships_in_rows: List[int] = []
 
-    def check_for_next_step(self, grid_state: GridState) -> bool:
-        for column in range(grid_state.grid.columns):
+    def check_for_next_step(self, grid_state: PuzzleState) -> bool:
+        for column in range(grid_state.puzzle.columns):
             if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_columns[column]) \
                     == self.currently_missing_ships_in_columns[column] \
                     and self.currently_missing_ships_in_columns[column] > 0:
                 return True
-        for row in range(grid_state.grid.rows):
+        for row in range(grid_state.puzzle.rows):
             if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_rows[row]) \
                     == self.currently_missing_ships_in_rows[row] \
                     and self.currently_missing_ships_in_rows[row] > 0:
                 return True
         return False
 
-    def do_next_step(self, grid_state: GridState):
+    def do_next_step(self, grid_state: PuzzleState):
         changes = False
-        for column in range(grid_state.grid.columns):
+        for column in range(grid_state.puzzle.columns):
             if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_columns[column]) \
                     == self.currently_missing_ships_in_columns[column] \
                     and self.currently_missing_ships_in_columns[column] > 0:
@@ -46,7 +46,7 @@ class FillUpShips(Step):
         # ToDo: when specific ship parts start to count, it will be important to go from longest ship to smallest
         if changes:
             self.prepare(grid_state)
-        for row in range(grid_state.grid.rows):
+        for row in range(grid_state.puzzle.rows):
             if FillUpShips.count_slots_in_lines(self.currently_free_lines_in_rows[row]) \
                     == self.currently_missing_ships_in_rows[row] \
                     and self.currently_missing_ships_in_rows[row] > 0:
@@ -54,20 +54,20 @@ class FillUpShips(Step):
                     continue
                 grid_state.place_ships(self.currently_free_lines_in_rows[row])
 
-    def prepare(self, grid_state: GridState):
-        for column in range(grid_state.grid.columns):
+    def prepare(self, grid_state: PuzzleState):
+        for column in range(grid_state.puzzle.columns):
             self.currently_free_lines_in_columns[column] = grid_state.get_free_lines({"columns": [column]})
-        for row in range(grid_state.grid.rows):
+        for row in range(grid_state.puzzle.rows):
             self.currently_free_lines_in_rows[row] = grid_state.get_free_lines({"rows": [row]})
         self.currently_missing_ships_in_columns \
             = [count - placed for (count, placed)
-               in zip(grid_state.grid.counts_columns, grid_state.current_counts_columns)]
+               in zip(grid_state.puzzle.counts_columns, grid_state.current_counts_columns)]
         self.currently_missing_ships_in_rows \
             = [count - placed for (count, placed)
-               in zip(grid_state.grid.counts_rows, grid_state.current_counts_rows)]
+               in zip(grid_state.puzzle.counts_rows, grid_state.current_counts_rows)]
 
     @staticmethod
-    def are_correct_ships_missing(grid_state: GridState, free_lines: Dict[int, List[List[List[int]]]]) -> bool:
+    def are_correct_ships_missing(grid_state: PuzzleState, free_lines: Dict[int, List[List[List[int]]]]) -> bool:
         for line_length, line_positions in free_lines.items():
             if line_length not in grid_state.left_ships:
                 return False

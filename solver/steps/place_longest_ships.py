@@ -1,4 +1,4 @@
-from grid_state import GridState
+from puzzle_state import PuzzleState
 from impossible_puzzle_exception import ImpossiblePuzzleException
 from steps.step import Step
 
@@ -9,7 +9,7 @@ class PlaceLongestShips(Step):
     longest ship, as there are ships left to place for that length.
     """
 
-    def check_for_next_step(self, grid_state: GridState):
+    def check_for_next_step(self, grid_state: PuzzleState):
         max_ship_length = max(grid_state.left_ships.keys())
         print(str(grid_state.free_lines))
         max_length_free_line = max(grid_state.free_lines.keys())
@@ -23,7 +23,7 @@ class PlaceLongestShips(Step):
         print("Ship keys: " + str(grid_state.left_ships.keys()))
         return False
 
-    def do_next_step(self, grid_state: GridState):
+    def do_next_step(self, grid_state: PuzzleState):
         max_ship_length = max(grid_state.left_ships.keys())
         max_length_free_line = max(grid_state.free_lines.keys())
         if max_length_free_line == max_ship_length:
@@ -36,5 +36,5 @@ class PlaceLongestShips(Step):
             else:
                 raise ImpossiblePuzzleException('Not enough free lines for left ships!')
 
-    def prepare(self, grid_state: GridState):
+    def prepare(self, grid_state: PuzzleState):
         grid_state.update_free_lines()

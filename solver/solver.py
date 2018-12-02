@@ -1,5 +1,9 @@
+from typing import Dict
+
+from enums.puzzle_param import PuzzleParam
+from enums.slot_state import SlotState
 from runner import Runner
-from solver.grid import Grid
+from solver.puzzle import Puzzle
 import time
 
 
@@ -10,21 +14,27 @@ class BattleShipSolver:
     It directly controls the runners, that can run the different logic steps
     to solve a battleship puzzle.
     """
-    def __init__(self, grid_columns, grid_rows, ships, counts_columns, counts_rows):
-        self.ships = ships
-        self.grid_columns = grid_columns
-        self.grid_rows = grid_rows
-        self.counts_columns = counts_columns
-        self.counts_rows = counts_rows
-
-        assert len(self.counts_columns) == self.grid_columns, \
+    def __init__(self, puzzle: Dict, debug=False):
+        self.puzzle = puzzle
+        self.debug = debug
+        assert len(puzzle[PuzzleParam.COUNTS_COLUMNS.value]) == puzzle[PuzzleParam.COLUMNS.value], \
             "number of column counts does not equal the number of columns"
-        assert len(self.counts_rows) == self.grid_rows, \
+        assert len(puzzle[PuzzleParam.COUNTS_ROWS.value]) == puzzle[PuzzleParam.ROWS.value], \
             "number of row counts does not equal the number of rows"
-        assert all(isinstance(item, int) for item in self.counts_columns), \
+        assert all(isinstance(item, int) for item in puzzle[PuzzleParam.COUNTS_COLUMNS.value]), \
             "There is a invalid value in the column counts"
-        assert all(isinstance(item, int) for item in self.counts_rows), \
+        assert all(isinstance(item, int) for item in puzzle[PuzzleParam.COUNTS_ROWS.value]), \
             "There is a invalid value in the row counts"
+        if PuzzleParam.INITIAL_STATE.value in puzzle:
+            assert len(puzzle[PuzzleParam.INITIAL_STATE.value]) == puzzle[PuzzleParam.ROWS.value], \
+                "The initial state has a different number of rows then the puzzle"
+            for row in puzzle[PuzzleParam.INITIAL_STATE.value]:
+                assert len(row) == puzzle[PuzzleParam.COLUMNS.value], \
+                    "The initial state has a different number of columns then the puzzle"
+            try:
+                [[SlotState[string] for string in list(row)] for row in puzzle[PuzzleParam.INITIAL_STATE.value]]
+            except ValueError:
+                raise ValueError("Initial state of puzzle contains unknown slot state")
 
         # other instance attributes
         self.start_time = None
@@ -34,7 +44,7 @@ class BattleShipSolver:
 
     def start(self):
         self.start_time = time.time()
-        self.grid = Grid(self.grid_columns, self.grid_rows, self.counts_columns, self.counts_rows, self.ships)
+        self.grid = Puzzle(self.puzzle)
         while not self.grid.is_solved():
             self.runner.run(self.grid.current_state)
             self.grid.current_state.display()
