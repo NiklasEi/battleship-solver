@@ -1,4 +1,4 @@
-from solver.grid_state import GridState
+from grid_state import GridState
 
 
 class Grid:
@@ -11,7 +11,7 @@ class Grid:
         self.counts_columns = counts_columns
         self.counts_rows = counts_rows
         self.ships = ships
-        self.initial_state = GridState(grid=self, ships=ships)
+        self.initial_state = GridState(grid=self, ships=ships, placed_ships={})
         self.current_state = self.initial_state
 
     def is_solved(self) -> bool:

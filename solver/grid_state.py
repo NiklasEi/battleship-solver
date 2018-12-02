@@ -1,7 +1,7 @@
 from typing import List, Dict
 
 import numpy as np
-from solver.slot_state import SlotState
+from enums.slot_state import SlotState
 
 
 class GridState:

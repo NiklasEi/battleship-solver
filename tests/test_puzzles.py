@@ -20,9 +20,13 @@ class TestPuzzles(TestCase):
             print("loaded " + str(self.puzzle_json))
 
     def test_puzzles(self):
-        for puzzle_json_dict in self.puzzle_json["puzzles"]:
+        for count, puzzle_json_dict in enumerate(self.puzzle_json["puzzles"]):
             puzzle = self.load_puzzle_data(puzzle_json_dict)
-            BattleShipSolver(puzzle["columns"], puzzle["rows"], puzzle["ships"], puzzle["counts_columns"], puzzle["counts_rows"]).start()
+            current_solver = BattleShipSolver(puzzle["columns"], puzzle["rows"], puzzle["ships"]
+                                              , puzzle["counts_columns"], puzzle["counts_rows"])
+            current_solver.start()
+            print("Puzzle " + str(count))
+            del current_solver
 
     @staticmethod
     def load_puzzle_data(puzzle_dict) -> Dict:
@@ -32,7 +36,7 @@ class TestPuzzles(TestCase):
         :param puzzle_dict: dictionary loaded from the json file
         :return: dictionary with correctly formatted values for use in the solver
         """
-        puzzle_dict["ships"] = {int(key):val for key, val in puzzle_dict["ships"].items()}
+        puzzle_dict["ships"] = {int(key): val for key, val in puzzle_dict["ships"].items()}
         return puzzle_dict
 
 

@@ -1,5 +1,5 @@
 from grid_state import GridState
-from slot_state import SlotState
+from enums.slot_state import SlotState
 from steps.step import Step
 
 
