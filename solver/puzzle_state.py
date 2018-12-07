@@ -64,7 +64,8 @@ class PuzzleState:
                 for coordinate in ship_position:
                     if self.state[coordinate[0]][coordinate[1]] != SlotState.EMPTY.value:
                         print("Unexpected value in slot! Should be empty, found: "
-                              + SlotState(self.state[coordinate[0]][coordinate[1]]).name + "; Overwriting with ship!")
+                              + SlotState(self.state[coordinate[0]][coordinate[1]]).name + "; Skipping slot!")
+                        continue
                     self.state[coordinate[0]][coordinate[1]] = SlotState.SHIP.value
                     self.current_counts_columns[coordinate[0]] += 1
                     self.current_counts_rows[coordinate[1]] += 1

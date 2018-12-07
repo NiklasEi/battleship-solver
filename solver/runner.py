@@ -22,9 +22,10 @@ class Runner:
             step.prepare(grid_state)
             if self.debug:
                 time_start = time.time()
+                check_for_next_step = step.check_for_next_step(grid_state)
                 print("Running step " + str(step.__class__.__name__) + ": Changes? "
-                      + str(step.check_for_next_step(grid_state)))
-                if step.check_for_next_step(grid_state):
+                      + str(check_for_next_step))
+                if check_for_next_step:
                     step.do_next_step(grid_state)
                     grid_state.update()
                     grid_state.display()

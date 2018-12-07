@@ -57,14 +57,19 @@ class PlaceLongestShips(Step):
     def prepare(self, grid_state: PuzzleState):
         self.relevant_free_lines_in_rows = {}
         self.relevant_free_lines_in_columns = {}
-        max_ship_length = max(grid_state.missing_ships.keys())
+        max_missing_ship_length = max(grid_state.missing_ships.keys())
         for row, missing_ships in enumerate(grid_state.currently_missing_ships_in_rows):
-            if missing_ships < max_ship_length or row not in grid_state.currently_free_lines_in_rows:
+            if missing_ships < max_missing_ship_length or row not in grid_state.currently_free_lines_in_rows \
+                    or max(grid_state.currently_free_lines_in_rows[row].keys()) < max_missing_ship_length:
                 continue
             self.relevant_free_lines_in_rows[row] = grid_state.currently_free_lines_in_rows[row]
         for column, missing_ships in enumerate(grid_state.currently_missing_ships_in_columns):
-            if missing_ships < max_ship_length or column not in grid_state.currently_free_lines_in_columns:
+            if missing_ships < max_missing_ship_length or column not in grid_state.currently_free_lines_in_columns \
+                    or max(grid_state.currently_free_lines_in_columns[column].keys()) < max_missing_ship_length:
                 continue
             self.relevant_free_lines_in_columns[column] = grid_state.currently_free_lines_in_columns[column]
+        print("Max missing ship length: " + str(max_missing_ship_length))
         print("Relevant free lines in columns: " + str(self.relevant_free_lines_in_columns))
+        print("Missing ships in columns: " + str(grid_state.currently_missing_ships_in_columns))
         print("Relevant free lines in rows: " + str(self.relevant_free_lines_in_rows))
+        print("Missing ships in rows: " + str(grid_state.currently_missing_ships_in_rows))

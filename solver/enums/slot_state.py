@@ -15,3 +15,6 @@ class SlotState(Enum):
     SHIP_EAST = "e"
     SHIP_WEST = "w"
     SHIP_SINGLE = "o"
+
+    def is_ship(self):
+        return self is not SlotState.EMPTY and self is not SlotState.WATER
