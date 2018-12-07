@@ -30,6 +30,8 @@ class PuzzleState:
             print("loading initial state...")
             for row, states_string in enumerate(initial_state):
                 for column, state_string in enumerate(list(states_string)):
+                    if SlotState(state_string) is SlotState.EMPTY:
+                        continue
                     self.place_single_slot_state(column, row, SlotState(state_string))
             self.calculate_missing_ships()
             self.update_free_lines()
